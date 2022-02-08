@@ -32,6 +32,9 @@ public class SongListController implements Initializable{
 
     @FXML
     private TextField artistText;
+
+    @FXML
+    private TextField albumText;
     
     @FXML
     private TextField yearText;
@@ -47,6 +50,9 @@ public class SongListController implements Initializable{
     private TableColumn<Song, String> artist;
 
     @FXML
+    private TableColumn<Song, String> album;
+
+    @FXML
     private TableColumn<Song, Integer> year;
 
     @Override
@@ -56,7 +62,7 @@ public class SongListController implements Initializable{
         addButton.setOnAction(e -> addButtonClicked());
         deleteButton.setOnAction(e -> deleteButtonClicked());
 
-        //Table Values
+        //Table events
         song.setCellValueFactory(new PropertyValueFactory<Song, String>("song"));
         song.setCellFactory(TextFieldTableCell.forTableColumn());
         song.setOnEditCommit(new EventHandler<CellEditEvent<Song, String>>() {
@@ -75,6 +81,15 @@ public class SongListController implements Initializable{
                 song.setArtist(event.getNewValue());
             }
         });
+        album.setCellValueFactory(new PropertyValueFactory<Song, String>("album"));
+        album.setCellFactory(TextFieldTableCell.forTableColumn());
+        album.setOnEditCommit(new EventHandler<CellEditEvent<Song, String>>() {
+            @Override
+            public void handle(CellEditEvent<Song, String> event) {
+                Song song = event.getRowValue();
+                song.setAlbum(event.getNewValue());
+            }
+        });
         year.setCellValueFactory(new PropertyValueFactory<Song, Integer>("year"));
         year.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         year.setOnEditCommit(new EventHandler<CellEditEvent<Song, Integer>>() {
@@ -86,11 +101,11 @@ public class SongListController implements Initializable{
         });
 
         //set default song and select first list item at start
-        tableView.getItems().add(new Song("Default1", "Default1", 2001));
-        tableView.getItems().add(new Song("Default2", "Default2", 2002));
-        tableView.getItems().add(new Song("Default3", "Default3", 2003));
-        tableView.getItems().add(new Song("Default4", "Default4", 2004));
-        tableView.getItems().add(new Song("Default5", "Default5", 2005));
+        tableView.getItems().add(new Song("Default1", "Default1", "Default1", 2001));
+        tableView.getItems().add(new Song("Default2", "Default2", "Default2", 2002));
+        tableView.getItems().add(new Song("Default3", "Default3", "Default3", 2003));
+        tableView.getItems().add(new Song("Default4", "Default4", "Default4", 2004));
+        tableView.getItems().add(new Song("Default5", "Default5", "Default5", 2005));
         tableView.getSelectionModel().select(0);
     }
     //Add Button Method
@@ -98,10 +113,12 @@ public class SongListController implements Initializable{
         Song newSong = new Song();
         newSong.setSong(songText.getText());
         newSong.setArtist(artistText.getText());
+        newSong.setAlbum(albumText.getText());
         newSong.setYear(Integer.parseInt(yearText.getText()));
         tableView.getItems().add(newSong);
         songText.clear();
         artistText.clear();
+        albumText.clear();
         yearText.clear();
 
     }

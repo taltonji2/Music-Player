@@ -14,15 +14,17 @@
             <Insets bottom="10.0" />
          </padding>
          <columns>
-            <TableColumn fx:id="song" prefWidth="285.3333536783857" resizable="false" sortable="false" text="Song" />
-            <TableColumn fx:id="artist" prefWidth="283.9999694824219" resizable="false" sortable="false" text="Artist" />
-            <TableColumn fx:id="year" prefWidth="95.333251953125" resizable="false" sortable="false" text="Year" />
+            <TableColumn fx:id="song" prefWidth="190.0" resizable="false" sortable="false" text="Song" />
+            <TableColumn fx:id="artist" prefWidth="190.0" resizable="false" sortable="false" text="Artist" />
+            <TableColumn fx:id="album" prefWidth="190.0" resizable="false" sortable="false" text="Album" />
+            <TableColumn fx:id="year" prefWidth="96.0" resizable="false" sortable="false" text="Year" />
          </columns>
       </TableView>
-      <TextField fx:id="songText" layoutX="14.0" layoutY="8.0" prefHeight="25.0" prefWidth="190.0" promptText="Song" />
-      <TextField fx:id="artistText" layoutX="212.0" layoutY="8.0" prefHeight="25.0" prefWidth="190.0" promptText="Artist" />
-      <TextField fx:id="yearText" layoutX="410.0" layoutY="8.0" prefHeight="25.0" prefWidth="70.0" promptText="Year" />
+      <TextField fx:id="songText" layoutX="14.0" layoutY="8.0" prefHeight="25.0" prefWidth="150.0" promptText="Song" />
+      <TextField fx:id="artistText" layoutX="172.0" layoutY="8.0" prefHeight="25.0" prefWidth="150.0" promptText="Artist" />
+      <TextField fx:id="albumText" layoutX="330.0" layoutY="8.0" maxWidth="150.0" promptText="Album" />
+      <TextField fx:id="yearText" layoutX="488.0" layoutY="8.0" prefHeight="25.0" prefWidth="70.0" promptText="Year" />
       <Button fx:id="deleteButton" layoutX="615.0" layoutY="8.0" mnemonicParsing="false" text="Delete" />
-      <Button fx:id="addButton" layoutX="488.0" layoutY="8.0" mnemonicParsing="false" text="Add" />
+      <Button fx:id="addButton" layoutX="567.0" layoutY="8.0" mnemonicParsing="false" text="Add" />
    </children>
 </AnchorPane>
