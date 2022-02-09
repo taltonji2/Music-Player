@@ -100,6 +100,16 @@ public class SongListController implements Initializable{
         
         artist.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
         artist.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        //initialize listener for tableview row selections to display in edit text fields
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                songEdit.setText(newVal.getSong());
+                artistEdit.setText(newVal.getArtist());
+                albumEdit.setText(newVal.getAlbum());
+                yearEdit.setText(Integer.toString(newVal.getYear()));
+            }
+        });
     
         
     }

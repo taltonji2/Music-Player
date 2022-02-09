@@ -29,8 +29,8 @@
             <Insets bottom="10.0" />
          </padding>
          <columns>
-            <TableColumn fx:id="song" prefWidth="150.0" resizable="false" sortable="false" text="Song" />
-            <TableColumn fx:id="artist" prefWidth="150.0" resizable="false" sortable="false" text="Artist" />
+            <TableColumn fx:id="song" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Song" />
+            <TableColumn fx:id="artist" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Artist" />
          </columns>
       </TableView>
       <TextField fx:id="songAdd" layoutX="320.0" layoutY="14.0" prefHeight="25.0" prefWidth="150.0" promptText="Song" />
