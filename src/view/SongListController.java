@@ -1,18 +1,28 @@
 package view;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
 
 public class SongListController implements Initializable{
@@ -115,33 +125,64 @@ public class SongListController implements Initializable{
     }
     //Add Button Method
     public void addButtonClicked() {
-        Song newSong = new Song();
-        newSong.setSong(songAdd.getText());
-        newSong.setArtist(artistAdd.getText());
-        newSong.setAlbum(albumAdd.getText());
-        newSong.setYear(Integer.parseInt(yearAdd.getText()));
-        tableView.getItems().add(newSong);
-        songAdd.clear();
-        artistAdd.clear();
-        albumAdd.clear();
-        yearAdd.clear();
+        try{
+            Song newSong = new Song();
+            newSong.setSong(songAdd.getText());
+            newSong.setArtist(artistAdd.getText());
+            newSong.setAlbum(albumAdd.getText());
+            newSong.setYear(Integer.parseInt(yearAdd.getText()));
+            tableView.getItems().add(newSong);
+            songAdd.clear();
+            artistAdd.clear();
+            albumAdd.clear();
+            yearAdd.clear();
+        } catch (Exception e)
+        {
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Alright, we are about to add this song");
+            alert.setContentText("Are you ok with this?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                // ... user chose OK
+            } else {
+                // ... user chose CANCEL or closed the dialog
+            }
+        }
+        
 
     }
     //Delete Button Method
     public void deleteButtonClicked() {
 
-        boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
-        if (firstSongInList == true) {
-            songSelected.forEach(songList::remove);
+        try {
+            boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+            if (firstSongInList == true) {
+                songSelected.forEach(songList::remove);
+            }
+            else {
+                songSelected.forEach(songList::remove);
+    
+            
+            tableView.getSelectionModel().selectNext();
+            }
+        } catch (Exception e)
+        {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error Dialog");
+            alert.setHeaderText("Look, we ran out of things for you to delete");
+            alert.setContentText("Are you ok with this?");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                // ... user chose OK
+            } else {
+                // ... user chose CANCEL or closed the dialog
+            }
         }
-        else {
-            songSelected.forEach(songList::remove);
-
         
-        tableView.getSelectionModel().selectNext();
-        }
 
     }
-   
 }
 
