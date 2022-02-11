@@ -126,22 +126,37 @@ public class SongListController implements Initializable{
     //Add Button Method
     public void addButtonClicked() {
         try{
-            Song newSong = new Song();
-            newSong.setSong(songAdd.getText());
-            newSong.setArtist(artistAdd.getText());
-            newSong.setAlbum(albumAdd.getText());
-            newSong.setYear(Integer.parseInt(yearAdd.getText()));
-            tableView.getItems().add(newSong);
-            songAdd.clear();
-            artistAdd.clear();
-            albumAdd.clear();
-            yearAdd.clear();
-        } catch (Exception e)
-        {
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Alright, we are about to add this song");
-            alert.setContentText("Are you ok with this?");
+            alert.setHeaderText("Do you wish to add this song");
+            alert.setContentText("Confirm or close");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                Song newSong = new Song();
+                newSong.setSong(songAdd.getText());
+                newSong.setArtist(artistAdd.getText());
+                newSong.setAlbum(albumAdd.getText());
+                newSong.setYear(Integer.parseInt(yearAdd.getText()));
+                tableView.getItems().add(newSong);
+                songAdd.clear();
+                artistAdd.clear();
+                albumAdd.clear();
+                yearAdd.clear();
+            }else {
+                    // ... user chose CANCEL or closed the dialog
+                songAdd.clear();
+                artistAdd.clear();
+                albumAdd.clear();
+                yearAdd.clear();
+            }
+            
+        } catch (Exception e)
+        {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error Dialog");
+            alert.setHeaderText("Song title and artist are required");
+            alert.setContentText("Confirm or close");
             
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
@@ -155,7 +170,6 @@ public class SongListController implements Initializable{
     }
     //Delete Button Method
     public void deleteButtonClicked() {
-
         try {
             boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
             if (firstSongInList == true) {
@@ -172,7 +186,7 @@ public class SongListController implements Initializable{
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
             alert.setHeaderText("Look, we ran out of things for you to delete");
-            alert.setContentText("Are you ok with this?");
+            alert.setContentText("Confirm or close");
             
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
@@ -181,8 +195,6 @@ public class SongListController implements Initializable{
                 // ... user chose CANCEL or closed the dialog
             }
         }
-        
-
     }
 }
 
