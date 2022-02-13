@@ -1,6 +1,7 @@
 package view;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -62,12 +63,6 @@ public class SongListController implements Initializable{
 
     @FXML
     private TableColumn<Song, String> artist;
-
-    @FXML
-    private TableColumn<Song, String> album;
-
-    @FXML
-    private TableColumn<Song, Integer> year;
     
     //Declare observable list
     private ObservableList<Song> songList, songSelected;
@@ -75,16 +70,20 @@ public class SongListController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        Song default1 = new Song("Default Song1", "Default Artist1", "Default Album1", 2001);
-        Song default2 = new Song("Default Song2", "Default Artist2", "Default Album2", 2002);
-        Song default3 = new Song("Default Song3", "Default Artist3", "Default Album3", 2003);
-        Song default4 = new Song("Default Song4", "Default Artist4", "Default Album4", 2004);
-        Song default5 = new Song("Default Song5", "Default Artist5", "Default Album5", 2005);
-        Song default6 = new Song("Default Song6", "Default Artist6", "Default Album6", 2006);
+        Song default1 = new Song("sDefault Song1", "bDefault Artist1", "Default Album1", 2001);
+        Song default2 = new Song("yDefault Song2", "wDefault Artist2", "Default Album2", 2002);
+        Song default3 = new Song("cDefault Song3", "aDefault Artist3", "Default Album3", 2003);
+        Song default4 = new Song("lDefault Song4", "wDefault Artist2", "Default Album4", 2004);
+        Song default5 = new Song("qDefault Song5", "tDefault Artist5", "Default Album5", 2005);
+        Song default6 = new Song("hDefault Song6", "jDefault Artist6", "Default Album6", 2006);
         
         songList = FXCollections.observableArrayList(default1, default2, default3, default4, default5, default6);
 
+        sortSongList();
+
         tableView.setItems(songList);
+
+    
         songSelected = tableView.getSelectionModel().getSelectedItems();
         
 
@@ -93,6 +92,7 @@ public class SongListController implements Initializable{
         //Button events
         addButton.setOnAction(e -> addButtonClicked());
         deleteButton.setOnAction(e -> deleteButtonClicked());
+        editButton.setOnAction(e -> editButtonClicked());
 
         //Table events
         song.setCellValueFactory(new PropertyValueFactory<Song, String>("song"));
@@ -113,6 +113,11 @@ public class SongListController implements Initializable{
     
         
     }
+    //Sort Method
+    public void sortSongList() {
+        songList.sort(Comparator.comparing(Song::getArtist)
+                .thenComparing(Comparator.comparing(Song::getSong)));
+    }
     //Add Button Method
     public void addButtonClicked() {
         Song newSong = new Song();
@@ -125,6 +130,7 @@ public class SongListController implements Initializable{
         artistAdd.clear();
         albumAdd.clear();
         yearAdd.clear();
+        sortSongList();
 
     }
     //Delete Button Method
@@ -142,6 +148,18 @@ public class SongListController implements Initializable{
         }
 
     }
+    //Edit Button Method
+    public void editButtonClicked() {
+        Song editSong = tableView.getSelectionModel().getSelectedItem();
+        editSong.setSong(songEdit.getText());
+        editSong.setArtist(artistEdit.getText());
+        editSong.setAlbum(albumEdit.getText());
+        editSong.setYear(Integer.parseInt(yearEdit.getText()));
+        sortSongList();
+        tableView.refresh();
+    }
+
+    
    
 }
 
