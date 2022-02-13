@@ -92,14 +92,7 @@ public class SongListController implements Initializable{
 
         tableView.setItems(songList);
 
-    
-        //songSelected = tableView.getSelectionModel().getSelectedItems();
-        
-
-    
-        tableView.setItems(songList);
-        songSelected = default1; //set first song as selected
-        
+        //set first song as selected
         tableView.getSelectionModel().select(0);
 
         //Button events
@@ -170,6 +163,7 @@ public class SongListController implements Initializable{
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
                 tableView.getItems().add(newSong);
+                sortSongList();
                 songAdd.clear();
                 artistAdd.clear();
                 albumAdd.clear();
@@ -200,7 +194,6 @@ public class SongListController implements Initializable{
     
     //Delete Button Method
     public void deleteButtonClicked() {
-        //boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
         if(songSelected != null)
         {
             Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -209,15 +202,16 @@ public class SongListController implements Initializable{
             alert.setContentText("Confirm or close.");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK) {
+                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+                if (firstSongInList)
                 songList.remove(songSelected);
-                //songSelected.forEach(songList::remove);
+                else {
+                    songList.remove(songSelected);
+                    tableView.getSelectionModel().selectNext();
+                    }
             }
-        } 
 
-        // else {
-        //     songSelected.forEach(songList::remove);
-        // tableView.getSelectionModel().selectNext();
-        // }
+        } 
     }
     //Edit Button Method
     public void editButtonClicked()
@@ -235,34 +229,11 @@ public class SongListController implements Initializable{
                 songSelected.setAlbum(albumEdit.getText());
                 songSelected.setArtist(artistEdit.getText());
                 songSelected.setYear(Integer.parseInt(yearEdit.getText()));
-                songEdit.clear();
-                artistEdit.clear();
-                albumEdit.clear();
-                yearEdit.clear();
+                sortSongList();
                 tableView.refresh();
-            }else {
-                // ... user chose CANCEL or closed the dialog
-            songAdd.clear();
-            artistAdd.clear();
-            albumAdd.clear();
-            yearAdd.clear();
             }
         }
     }
-    //Edit Button Method
-    // public void editButtonClicked() {
-    //     Song editSong = tableView.getSelectionModel().getSelectedItem();
-    //     editSong.setSong(songEdit.getText());
-    //     editSong.setArtist(artistEdit.getText());
-    //     editSong.setAlbum(albumEdit.getText());
-    //     editSong.setYear(Integer.parseInt(yearEdit.getText()));
-    //     sortSongList();
-    //     tableView.refresh();
-    // }
-
-    
    
-
-    
 }
 
