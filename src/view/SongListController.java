@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -20,9 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-
-
-
 
 public class SongListController implements Initializable{
 
@@ -168,6 +164,7 @@ public class SongListController implements Initializable{
             }
         }
     }
+
     //Sort Method
     public void sortSongList() {
         songList.sort(Comparator.comparing(Song::getArtist)
@@ -190,7 +187,8 @@ public class SongListController implements Initializable{
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
                 tableView.getItems().add(newSong);
-                SongPersistence.addToFile(newSong);
+                SongPersistence.clearFile();
+                for (Song s : songList){SongPersistence.writeToFile(s);}
                 songAdd.clear();
                 artistAdd.clear();
                 albumAdd.clear();
@@ -221,29 +219,28 @@ public class SongListController implements Initializable{
     
     //Delete Button Method
     public void deleteButtonClicked() {
-        if(songSelected != null)
-        {
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Do you wish to delete this song?");
-            alert.setContentText("Confirm or close.");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
-                if (firstSongInList)
+    if(songSelected != null)
+    {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Do you wish to delete this song?");
+        alert.setContentText("Confirm or close.");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+            if (firstSongInList)
+            songList.remove(songSelected);
+            SongPersistence.clearFile();
+            for (Song s : songList){SongPersistence.writeToFile(s);}
+            //songSelected.forEach(songList::remove);
+        }
+    
+            else {
                 songList.remove(songSelected);
-                SongPersistence.clearFile();
-                for (Song s : songList){SongPersistence.writeToFile(s);}
-                //songSelected.forEach(songList::remove);
-            }
-        
-                else {
-                    songList.remove(songSelected);
-                    tableView.getSelectionModel().selectNext();
-                    }
-            }
+                tableView.getSelectionModel().selectNext();
+                }
+        }
 
-        } 
-   
+    } 
 }
 
