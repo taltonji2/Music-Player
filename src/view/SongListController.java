@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -12,13 +14,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Cell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
 
 
 
@@ -77,7 +82,8 @@ public class SongListController implements Initializable{
     private TableColumn<Song, Integer> year;
     
     //Declare observable list
-    private ObservableList<Song> songList, songSelected;
+    private ObservableList<Song> songList;
+    private Song songSelected;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -90,11 +96,9 @@ public class SongListController implements Initializable{
         Song default6 = new Song("Default Song6", "Default Artist6", "Default Album6", 2006);
         
         songList = FXCollections.observableArrayList(default1, default2, default3, default4, default5, default6);
-
+    
         tableView.setItems(songList);
-        songSelected = tableView.getSelectionModel().getSelectedItems();
-        
-
+        songSelected = default1; //set first song as selected
         tableView.getSelectionModel().select(0);
 
         //Button events
@@ -109,24 +113,69 @@ public class SongListController implements Initializable{
         artist.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
         artist.setCellFactory(TextFieldTableCell.forTableColumn());
 
+        
         //initialize listener for tableview row selections to display in edit text fields
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            songSelected = newVal;
+            yearEdit.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, 
+                    String newValue) {
+                    if (!newValue.matches("\\d*")) {
+                        yearEdit.setText(newValue.replaceAll("[^\\d]", ""));
+                    }
+                }
+            });
+            yearAdd.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, 
+                    String newValue) {
+                    if (!newValue.matches("\\d*")) {
+                        yearAdd.setText(newValue.replaceAll("[^\\d]", ""));
+                    }
+                }
+            });
             if (newVal != null) {
+                //update selected song
                 songEdit.setText(newVal.getSong());
                 artistEdit.setText(newVal.getArtist());
                 albumEdit.setText(newVal.getAlbum());
                 yearEdit.setText(Integer.toString(newVal.getYear()));
             }
+            
         });
+            
     }
+    
     //Edit Button Method
     public void editButtonClicked()
-    {
-        tableView.setEditable(true);
-        TableColumn selectedSong = tableView.getColumns().get(0);
-        
-
-        
+    {   
+        if(songSelected != null)
+        {
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Do you wish to edit this song?");
+            alert.setContentText("Confirm or close.");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                songSelected.setSong(songEdit.getText());
+                songSelected.setAlbum(albumEdit.getText());
+                songSelected.setArtist(artistEdit.getText());
+                songSelected.setYear(Integer.parseInt(yearEdit.getText()));
+                songEdit.clear();
+                artistEdit.clear();
+                albumEdit.clear();
+                yearEdit.clear();
+                tableView.refresh();
+            }else {
+                // ... user chose CANCEL or closed the dialog
+            songAdd.clear();
+            artistAdd.clear();
+            albumAdd.clear();
+            yearAdd.clear();
+            }
+        }
     }
 
     //Add Button Method
@@ -134,8 +183,8 @@ public class SongListController implements Initializable{
         try{
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Do you wish to add this song");
-            alert.setContentText("Confirm or close");
+            alert.setHeaderText("Do you wish to add this song?");
+            alert.setContentText("Confirm or close.");
             
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
@@ -161,8 +210,8 @@ public class SongListController implements Initializable{
         {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
-            alert.setHeaderText("Song title and artist are required");
-            alert.setContentText("Confirm or close");
+            alert.setHeaderText("Song title and artist are required.");
+            alert.setContentText("Confirm or close.");
             
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
@@ -175,29 +224,24 @@ public class SongListController implements Initializable{
     
     //Delete Button Method
     public void deleteButtonClicked() {
-        try {
-            boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
-            if (firstSongInList == true) {
-                songSelected.forEach(songList::remove);
-            }
-            else {
-                songSelected.forEach(songList::remove);
-            tableView.getSelectionModel().selectNext();
-            }
-        } catch (Exception e)
+        //boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+        if(songSelected != null)
         {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error Dialog");
-            alert.setHeaderText("Look, we ran out of things for you to delete");
-            alert.setContentText("Confirm or close");
-            
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Do you wish to delete this song?");
+            alert.setContentText("Confirm or close.");
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                // ... user chose OK
-            } else {
-                // ... user chose CANCEL or closed the dialog
+            if (result.get() == ButtonType.OK) {
+                songList.remove(songSelected);
+                //songSelected.forEach(songList::remove);
             }
-        }
+        } 
+
+        // else {
+        //     songSelected.forEach(songList::remove);
+        // tableView.getSelectionModel().selectNext();
+        // }
     }
 
     

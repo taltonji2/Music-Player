@@ -17,7 +17,7 @@ public class SongLib extends Application {
 		
 		// load the fxml
 		AnchorPane root = (AnchorPane)loader.load();
-
+		
 		Scene scene = new Scene(root, 500, 500);
 		primaryStage.setTitle("Song Library");
 		primaryStage.setScene(scene);
