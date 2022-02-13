@@ -1,6 +1,7 @@
 package view;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -19,6 +20,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 5dc93714f7d61ab9a11005f3d717c807df1c5f4d
 
 
 public class SongListController implements Initializable{
@@ -68,12 +74,6 @@ public class SongListController implements Initializable{
 
     @FXML
     private TableColumn<Song, String> artist;
-
-    @FXML
-    private TableColumn<Song, String> album;
-
-    @FXML
-    private TableColumn<Song, Integer> year;
     
     //Declare observable list
     private ObservableList<Song> songList;
@@ -82,6 +82,7 @@ public class SongListController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+<<<<<<< HEAD
 
         songList = FXCollections.observableArrayList();
         for (Song s : SongPersistence.restoreFromFile())
@@ -91,6 +92,22 @@ public class SongListController implements Initializable{
         
         tableView.setItems(songList);
         songSelected = songList.get(0); //set first song as selected
+=======
+        Song default1 = new Song("sDefault Song1", "bDefault Artist1", "Default Album1", 2001);
+        Song default2 = new Song("yDefault Song2", "wDefault Artist2", "Default Album2", 2002);
+        Song default3 = new Song("cDefault Song3", "aDefault Artist3", "Default Album3", 2003);
+        Song default4 = new Song("lDefault Song4", "wDefault Artist2", "Default Album4", 2004);
+        Song default5 = new Song("qDefault Song5", "tDefault Artist5", "Default Album5", 2005);
+        Song default6 = new Song("hDefault Song6", "jDefault Artist6", "Default Album6", 2006);
+        
+        songList = FXCollections.observableArrayList(default1, default2, default3, default4, default5, default6);
+
+        sortSongList();
+
+        tableView.setItems(songList);
+
+        //set first song as selected
+>>>>>>> 5dc93714f7d61ab9a11005f3d717c807df1c5f4d
         tableView.getSelectionModel().select(0);
 
         //Button events
@@ -139,6 +156,7 @@ public class SongListController implements Initializable{
             
     }
     
+<<<<<<< HEAD
     //Edit Button Method
     public void editButtonClicked()
     {   
@@ -170,6 +188,12 @@ public class SongListController implements Initializable{
             yearAdd.clear();
             }
         }
+=======
+    //Sort Method
+    public void sortSongList() {
+        songList.sort(Comparator.comparing(Song::getArtist)
+                .thenComparing(Comparator.comparing(Song::getSong)));
+>>>>>>> 5dc93714f7d61ab9a11005f3d717c807df1c5f4d
     }
 
     //Add Button Method
@@ -219,7 +243,6 @@ public class SongListController implements Initializable{
     
     //Delete Button Method
     public void deleteButtonClicked() {
-        //boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
         if(songSelected != null)
         {
             Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -228,18 +251,43 @@ public class SongListController implements Initializable{
             alert.setContentText("Confirm or close.");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK) {
+                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+                if (firstSongInList)
                 songList.remove(songSelected);
                 SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}
                 //songSelected.forEach(songList::remove);
             }
-        } 
-        // else {
-        //     songSelected.forEach(songList::remove);
-        // tableView.getSelectionModel().selectNext();
-        // }
-    }
+        
+                else {
+                    songList.remove(songSelected);
+                    tableView.getSelectionModel().selectNext();
+                    }
+            }
 
+        } 
     
+    //Edit Button Method
+    public void editButtonClicked()
+    {   
+        if(songSelected != null)
+        {
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Do you wish to edit this song?");
+            alert.setContentText("Confirm or close.");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                songSelected.setSong(songEdit.getText());
+                songSelected.setAlbum(albumEdit.getText());
+                songSelected.setArtist(artistEdit.getText());
+                songSelected.setYear(Integer.parseInt(yearEdit.getText()));
+                sortSongList();
+                tableView.refresh();
+            }
+        }
+    }
+   
 }
 
