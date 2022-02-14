@@ -9,14 +9,6 @@
         "c:\\Users\\Timothy\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.swing.jar",
         "c:\\Users\\Timothy\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.web.jar",
         "c:\\Users\\Timothy\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx-swt.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.base.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.controls.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.fxml.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.graphics.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.media.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.swing.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx.web.jar",
-        "c:\\Users\\atfan\\Downloads\\openjfx-17.0.2_windows-x64_bin-sdk\\javafx-sdk-17.0.2\\lib\\javafx-swt.jar",
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.base.jar",
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.controls.jar",
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.swing.jar",
@@ -24,7 +16,15 @@
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx-swt.jar",
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.fxml.jar",
         "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.graphics.jar",
-        "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.media.jar"
+        "/Users/timothy/Downloads/javafx-sdk-17.0.2/lib/javafx.media.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.base.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.controls.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.fxml.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.graphics.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.media.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.swing.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx.web.jar",
+        "c:\\Users\\atfan\\OneDrive\\Desktop\\Java\\javafx-sdk-17.0.2\\lib\\javafx-swt.jar"
     ],
    
 }
