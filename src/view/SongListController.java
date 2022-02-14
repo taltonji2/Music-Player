@@ -81,7 +81,7 @@ public class SongListController implements Initializable{
         {
             songList.add(s);
         }
-        
+        sortSongList();
         tableView.setItems(songList);
         songSelected = songList.get(0); //set first song as selected
         tableView.getSelectionModel().select(0);
@@ -148,6 +148,7 @@ public class SongListController implements Initializable{
                 songSelected.setAlbum(albumEdit.getText());
                 songSelected.setArtist(artistEdit.getText());
                 songSelected.setYear(Integer.parseInt(yearEdit.getText()));
+                sortSongList();
                 SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}
                 songEdit.clear();
@@ -187,6 +188,7 @@ public class SongListController implements Initializable{
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
                 tableView.getItems().add(newSong);
+                sortSongList();
                 SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}
                 songAdd.clear();
@@ -219,28 +221,26 @@ public class SongListController implements Initializable{
     
     //Delete Button Method
     public void deleteButtonClicked() {
-    if(songSelected != null)
-    {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation Dialog");
-        alert.setHeaderText("Do you wish to delete this song?");
-        alert.setContentText("Confirm or close.");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
-            if (firstSongInList)
-            songList.remove(songSelected);
-            SongPersistence.clearFile();
-            for (Song s : songList){SongPersistence.writeToFile(s);}
-            //songSelected.forEach(songList::remove);
-        }
-    
-            else {
-                songList.remove(songSelected);
-                tableView.getSelectionModel().selectNext();
+        if(songSelected != null) {
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Do you wish to delete this song?");
+            alert.setContentText("Confirm or close.");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+                if (firstSongInList) {
+                    songList.remove(songSelected);
+                    SongPersistence.clearFile();
                 }
-        }
-
+                else {
+                    songList.remove(songSelected);
+                    tableView.getSelectionModel().selectNext();
+                    SongPersistence.clearFile();
+                }
+                for (Song s : songList){SongPersistence.writeToFile(s);}   
+            }
+        }     
     } 
 }
 

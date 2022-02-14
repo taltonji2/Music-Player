@@ -22,7 +22,7 @@ public class SongPersistence {
             writer.append(songContent + "\n");
             writer.close();
         } catch (IOException e) {
-            // Cxception handling
+            // Exception handling
             System.out.println(e);
         }
     }
