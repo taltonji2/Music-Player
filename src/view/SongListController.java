@@ -1,15 +1,12 @@
 package view;
 
-import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -19,8 +16,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
-public class SongListController implements Initializable{
+
+public class SongListController {
 
     //Buttons
     @FXML
@@ -72,8 +71,8 @@ public class SongListController implements Initializable{
     private ObservableList<Song> songList;
     private Song songSelected;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    
+    public void start(Stage mainStage){
 
 
         songList = FXCollections.observableArrayList();
