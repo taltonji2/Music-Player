@@ -1,7 +1,10 @@
 package view;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -74,17 +77,28 @@ public class SongListController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-
         songList = FXCollections.observableArrayList();
-        for (Song s : SongPersistence.restoreFromFile())
+        String directory = System.getProperty("user.dir");
+        String fileName = "library0.txt";
+        String absolutePath = directory + File.separator + "src/" + fileName;
+        File f = new File(absolutePath);
+
+        if(f.exists() && !f.isDirectory()) { 
+            if (f.length() != 0)
+            {
+                for (Song s : SongPersistence.restoreFromFile())
+                {
+                    songList.add(s);
+                }
+                sortSongList();
+                tableView.setItems(songList);
+                songSelected = songList.get(0); //set first song as selected
+                tableView.getSelectionModel().select(0);
+            }
+        } else
         {
-            songList.add(s);
+            SongPersistence.createFile();
         }
-        sortSongList();
-        tableView.setItems(songList);
-        songSelected = songList.get(0); //set first song as selected
-        tableView.getSelectionModel().select(0);
 
         //Button events
         addButton.setOnAction(e -> addButtonClicked());
@@ -174,7 +188,8 @@ public class SongListController implements Initializable{
 
     //Add Button Method
     public void addButtonClicked() {
-        try{
+        if (songAdd != null && artistAdd != null)
+        {
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Confirmation Dialog");
             alert.setHeaderText("Do you wish to add this song?");
@@ -187,6 +202,7 @@ public class SongListController implements Initializable{
                 newSong.setArtist(artistAdd.getText());
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
+                songList.add(newSong);
                 tableView.getItems().add(newSong);
                 sortSongList();
                 SongPersistence.clearFile();
@@ -201,9 +217,8 @@ public class SongListController implements Initializable{
                 artistAdd.clear();
                 albumAdd.clear();
                 yearAdd.clear();
-            }
-            
-        } catch (Exception e)
+            } 
+        } else
         {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
@@ -230,15 +245,17 @@ public class SongListController implements Initializable{
             if (result.get() == ButtonType.OK) {
                 boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
                 if (firstSongInList) {
+                    tableView.getItems().remove(songSelected);
                     songList.remove(songSelected);
                     SongPersistence.clearFile();
-                }
-                else {
-                    songList.remove(songSelected);
-                    tableView.getSelectionModel().selectNext();
-                    SongPersistence.clearFile();
-                }
+                    for (Song s : songList){SongPersistence.writeToFile(s);}   
+                } else {
+                tableView.getItems().remove(songSelected);
+                songList.remove(songSelected);
+                SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}   
+                tableView.getSelectionModel().selectNext();
+                }
             }
         }     
     } 

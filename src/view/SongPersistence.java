@@ -31,15 +31,25 @@ public class SongPersistence {
     {
       File mySongLib = new File(absolutePath); 
       mySongLib.delete();
-      new File(absolutePath); 
+      createFile();
     }
 
     public static List<Song> restoreFromFile()
     {
-        try {
+      List<Song> songList = new ArrayList<Song>();
+      try { 
+          File f = new File(absolutePath);
+          if(f.exists() && !f.isDirectory()) 
+          { 
             File myFile = new File(absolutePath);
             Scanner myReader = new Scanner(myFile);
-            List<Song> songList = new ArrayList<Song>();
+          
+            if(myFile.length() == 0)
+            {
+              songList = null;
+              myReader.close();
+              return songList;
+            }
             while (myReader.hasNextLine()) {
               String songStringData = myReader.nextLine();
               String[] a = songStringData.split(", ");
@@ -48,10 +58,25 @@ public class SongPersistence {
             }
             myReader.close();
             return  songList;
-          } catch (FileNotFoundException e) {
-            System.out.println(e);
-            e.printStackTrace();
-          }
-        return null;
+          } 
+        } catch (FileNotFoundException e) {
+         
+          songList = new ArrayList<Song>();
+          songList = null;
+          return songList;
+        }
+      return songList;
+    }
+
+    public static void createFile ()
+    {
+      File f = new File(absolutePath);
+      f.getParentFile().mkdirs(); 
+      try {
+        f.createNewFile();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
 }
