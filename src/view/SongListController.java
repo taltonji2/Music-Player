@@ -148,17 +148,13 @@ public class SongListController {
                 sortSongList();
                 SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}
-                songEdit.clear();
-                artistEdit.clear();
-                albumEdit.clear();
-                yearEdit.clear();
                 listView.refresh();
             }else {
                 // ... user chose CANCEL or closed the dialog
-            songAdd.clear();
-            artistAdd.clear();
-            albumAdd.clear();
-            yearAdd.clear();
+                songEdit.setText(songSelected.getSong());
+                artistEdit.setText(songSelected.getArtist());
+                albumEdit.setText(songSelected.getAlbum());
+                yearEdit.setText(Integer.toString(songSelected.getYear()));
             }
         }
     }
