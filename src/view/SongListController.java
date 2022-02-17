@@ -1,6 +1,5 @@
 package view;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 import javafx.beans.value.ChangeListener;
@@ -166,15 +165,8 @@ public class SongListController {
 
     //Sort Method
     public void sortSongList() {
-        // Comparator<Song> comparator = Comparator.comparing(Song::getSong);
-        // Collections.sort(songList, new Comparator<String>() {
-        //     @Override
-        //     public int compare(String o1, String o2) {              
-        //         return o1.compareToIgnoreCase(o2);
-        //     }
-        // });
-        songList.sort(Comparator.comparing(Song::getArtist)
-                .thenComparing(Comparator.comparing(Song::getSong)));
+        songList.sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(Comparator.comparing(Song::getSong, String.CASE_INSENSITIVE_ORDER)));
     }
 
     //Add Button Method
