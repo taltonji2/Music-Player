@@ -1,5 +1,6 @@
 package view;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 import javafx.beans.value.ChangeListener;
@@ -10,12 +11,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
 
@@ -57,15 +56,9 @@ public class SongListController {
     @FXML
     private TextField yearEdit;
 
-    //Table Cols
+    //List View
     @FXML
-    private TableView<Song> tableView;
-
-    @FXML
-    private TableColumn<Song, String> song;
-
-    @FXML
-    private TableColumn<Song, String> artist;
+    private ListView<Song> listView;
     
     //Declare observable list
     private ObservableList<Song> songList;
@@ -81,25 +74,31 @@ public class SongListController {
             songList.add(s);
         }
         sortSongList();
-        tableView.setItems(songList);
+        listView.setItems(songList);
         songSelected = songList.get(0); //set first song as selected
-        tableView.getSelectionModel().select(0);
+        listView.getSelectionModel().select(0);
 
         //Button events
         addButton.setOnAction(e -> addButtonClicked());
         deleteButton.setOnAction(e -> deleteButtonClicked());
         editButton.setOnAction(e -> editButtonClicked());
 
-        //Table events
-        song.setCellValueFactory(new PropertyValueFactory<Song, String>("song"));
-        song.setCellFactory(TextFieldTableCell.forTableColumn());
-        
-        artist.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
-        artist.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        
+        //display song/artist in listview
+        listView.setCellFactory(param -> new ListCell<Song>() {
+            @Override
+            protected void updateItem(Song s, boolean empty){
+            super.updateItem(s, empty);
+                if(empty || s == null || s.getSong() == null){
+                    setText("");
+                }
+                else {
+                    setText(s.getSong()+"/"+s.getArtist());
+                }             
+            }
+        });
+   
         //initialize listener for tableview row selections to display in edit text fields
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             songSelected = newVal;
             yearEdit.textProperty().addListener(new ChangeListener<String>() {
                 @Override
@@ -154,7 +153,7 @@ public class SongListController {
                 artistEdit.clear();
                 albumEdit.clear();
                 yearEdit.clear();
-                tableView.refresh();
+                listView.refresh();
             }else {
                 // ... user chose CANCEL or closed the dialog
             songAdd.clear();
@@ -167,6 +166,13 @@ public class SongListController {
 
     //Sort Method
     public void sortSongList() {
+        // Comparator<Song> comparator = Comparator.comparing(Song::getSong);
+        // Collections.sort(songList, new Comparator<String>() {
+        //     @Override
+        //     public int compare(String o1, String o2) {              
+        //         return o1.compareToIgnoreCase(o2);
+        //     }
+        // });
         songList.sort(Comparator.comparing(Song::getArtist)
                 .thenComparing(Comparator.comparing(Song::getSong)));
     }
@@ -186,7 +192,7 @@ public class SongListController {
                 newSong.setArtist(artistAdd.getText());
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
-                tableView.getItems().add(newSong);
+                listView.getItems().add(newSong);
                 sortSongList();
                 SongPersistence.clearFile();
                 for (Song s : songList){SongPersistence.writeToFile(s);}
@@ -227,14 +233,14 @@ public class SongListController {
             alert.setContentText("Confirm or close.");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK) {
-                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
+                boolean firstSongInList = listView.getSelectionModel().isSelected(0);
                 if (firstSongInList) {
                     songList.remove(songSelected);
                     SongPersistence.clearFile();
                 }
                 else {
                     songList.remove(songSelected);
-                    tableView.getSelectionModel().selectNext();
+                    listView.getSelectionModel().selectNext();
                     SongPersistence.clearFile();
                 }
                 for (Song s : songList){SongPersistence.writeToFile(s);}   
