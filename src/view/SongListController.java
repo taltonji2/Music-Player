@@ -1,14 +1,10 @@
 package view;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -116,24 +112,6 @@ public class SongListController implements Initializable{
         //initialize listener for tableview row selections to display in edit text fields
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             songSelected = newVal;
-            yearEdit.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, 
-                    String newValue) {
-                    if (!newValue.matches("\\d*")) {
-                        yearEdit.setText(newValue.replaceAll("[^\\d]", ""));
-                    }
-                }
-            });
-            yearAdd.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, 
-                    String newValue) {
-                    if (!newValue.matches("\\d*")) {
-                        yearAdd.setText(newValue.replaceAll("[^\\d]", ""));
-                    }
-                }
-            });
             if (newVal != null) {
                 //update selected song
                 songEdit.setText(newVal.getSong());
@@ -164,13 +142,18 @@ public class SongListController implements Initializable{
                 songSelected.setYear(Integer.parseInt(yearEdit.getText()));
                 sortSongList();
                 SongPersistence.clearFile();
-                for (Song s : songList){SongPersistence.writeToFile(s);}
+                String songListString = "";
+                for (Song s : songList)
+                {
+                    songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                    SongPersistence.writeToFile(songListString);
+                }
                 songEdit.clear();
                 artistEdit.clear();
                 albumEdit.clear();
                 yearEdit.clear();
                 tableView.refresh();
-            }else {
+            } else {
                 // ... user chose CANCEL or closed the dialog
             songAdd.clear();
             artistAdd.clear();
@@ -206,20 +189,24 @@ public class SongListController implements Initializable{
                 tableView.getItems().add(newSong);
                 sortSongList();
                 SongPersistence.clearFile();
-                for (Song s : songList){SongPersistence.writeToFile(s);}
+                String songListString = "";
+                for (Song s : songList)
+                {
+                    songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                    SongPersistence.writeToFile(songListString);
+                }
                 songAdd.clear();
                 artistAdd.clear();
                 albumAdd.clear();
                 yearAdd.clear();
-            }else {
+            } else {
                     // ... user chose CANCEL or closed the dialog
                 songAdd.clear();
                 artistAdd.clear();
                 albumAdd.clear();
                 yearAdd.clear();
             } 
-        } else
-        {
+        } else {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
             alert.setHeaderText("Song title and artist are required.");
@@ -234,6 +221,8 @@ public class SongListController implements Initializable{
         }
     }
     
+
+    //Delete deletes two songs
     //Delete Button Method
     public void deleteButtonClicked() {
         if(songSelected != null) {
@@ -248,15 +237,28 @@ public class SongListController implements Initializable{
                     tableView.getItems().remove(songSelected);
                     songList.remove(songSelected);
                     SongPersistence.clearFile();
-                    for (Song s : songList){SongPersistence.writeToFile(s);}   
+                    String songListString = "";
+                    for (Song s : songList)
+                    {
+                        songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                        SongPersistence.writeToFile(songListString);
+                    }
                 } else {
                 tableView.getItems().remove(songSelected);
-                songList.remove(songSelected);
                 SongPersistence.clearFile();
-                for (Song s : songList){SongPersistence.writeToFile(s);}   
+                String songListString = "";
+                for (Song s : songList)
+                {
+                    songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                    SongPersistence.writeToFile(songListString);
+                }
                 tableView.getSelectionModel().selectNext();
                 }
             }
+            if(songList.isEmpty())
+            {
+                SongPersistence.clearFile();
+            }   
         }     
     } 
 }

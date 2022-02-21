@@ -14,12 +14,11 @@ public class SongPersistence {
     static String fileName = "library0.txt";
     static String absolutePath = directory + File.separator + "src/" + fileName;
 
-    public static void writeToFile(Song song)
+    public static void writeToFile(String songList)
     {
         // Write the content in file 
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(absolutePath, true));) {
-            String songContent = song.getSong() + ", " + song.getArtist() + ", " + song.getAlbum() + ", " + song.getYear();
-            writer.append(songContent + "\n");
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(absolutePath, false));) {
+            writer.append(songList);
             writer.close();
         } catch (IOException e) {
             // Exception handling
@@ -29,9 +28,14 @@ public class SongPersistence {
 
     public static void clearFile()
     {
-      File mySongLib = new File(absolutePath); 
-      mySongLib.delete();
-      createFile();
+      try(BufferedWriter writer = new BufferedWriter(new FileWriter(absolutePath, false));) {
+        String songContent = "";
+        writer.append(songContent + "\n");
+        writer.close();
+    } catch (IOException e) {
+        // Exception handling
+        System.out.println(e);
+    }
     }
 
     public static List<Song> restoreFromFile()
