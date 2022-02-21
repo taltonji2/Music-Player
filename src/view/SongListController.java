@@ -1,25 +1,22 @@
 package view;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
-public class SongListController implements Initializable{
+
+public class SongListController {
 
     //Buttons
     @FXML
@@ -57,22 +54,18 @@ public class SongListController implements Initializable{
     @FXML
     private TextField yearEdit;
 
-    //Table Cols
+    //List View
     @FXML
-    private TableView<Song> tableView;
-
-    @FXML
-    private TableColumn<Song, String> song;
-
-    @FXML
-    private TableColumn<Song, String> artist;
+    private ListView<Song> listView;
     
     //Declare observable list
     private ObservableList<Song> songList;
     private Song songSelected;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    
+    public void start(Stage mainStage){
+
+
         songList = FXCollections.observableArrayList();
         String directory = System.getProperty("user.dir");
         String fileName = "library0.txt";
@@ -87,30 +80,40 @@ public class SongListController implements Initializable{
                     songList.add(s);
                 }
                 sortSongList();
-                tableView.setItems(songList);
+                listView.setItems(songList);
                 songSelected = songList.get(0); //set first song as selected
-                tableView.getSelectionModel().select(0);
+                listView.getSelectionModel().select(0);
             }
         } else
         {
             SongPersistence.createFile();
         }
+        sortSongList();
+        listView.setItems(songList);
+        songSelected = songList.get(0); //set first song as selected
+        listView.getSelectionModel().select(0);
 
         //Button events
         addButton.setOnAction(e -> addButtonClicked());
         deleteButton.setOnAction(e -> deleteButtonClicked());
         editButton.setOnAction(e -> editButtonClicked());
 
-        //Table events
-        song.setCellValueFactory(new PropertyValueFactory<Song, String>("song"));
-        song.setCellFactory(TextFieldTableCell.forTableColumn());
-        
-        artist.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
-        artist.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        
+        //display song/artist in listview
+        listView.setCellFactory(param -> new ListCell<Song>() {
+            @Override
+            protected void updateItem(Song s, boolean empty){
+            super.updateItem(s, empty);
+                if(empty || s == null || s.getSong() == null){
+                    setText("");
+                }
+                else {
+                    setText(s.getSong()+"/"+s.getArtist());
+                }             
+            }
+        });
+   
         //initialize listener for tableview row selections to display in edit text fields
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             songSelected = newVal;
             if (newVal != null) {
                 //update selected song
@@ -152,21 +155,23 @@ public class SongListController implements Initializable{
                 artistEdit.clear();
                 albumEdit.clear();
                 yearEdit.clear();
-                tableView.refresh();
+                listView.refresh();
             } else {
                 // ... user chose CANCEL or closed the dialog
-            songAdd.clear();
-            artistAdd.clear();
-            albumAdd.clear();
-            yearAdd.clear();
+              
+                listView.refresh();
+                songEdit.setText(songSelected.getSong());
+                artistEdit.setText(songSelected.getArtist());
+                albumEdit.setText(songSelected.getAlbum());
+                yearEdit.setText(Integer.toString(songSelected.getYear()));
             }
         }
     }
 
     //Sort Method
     public void sortSongList() {
-        songList.sort(Comparator.comparing(Song::getArtist)
-                .thenComparing(Comparator.comparing(Song::getSong)));
+        songList.sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(Comparator.comparing(Song::getSong, String.CASE_INSENSITIVE_ORDER)));
     }
 
     //Add Button Method
@@ -186,7 +191,7 @@ public class SongListController implements Initializable{
                 newSong.setAlbum(albumAdd.getText());
                 newSong.setYear(Integer.parseInt(yearAdd.getText()));
                 songList.add(newSong);
-                tableView.getItems().add(newSong);
+                listView.getItems().add(newSong);
                 sortSongList();
                 SongPersistence.clearFile();
                 String songListString = "";
@@ -232,10 +237,10 @@ public class SongListController implements Initializable{
             alert.setContentText("Confirm or close.");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK) {
-                boolean firstSongInList = tableView.getSelectionModel().isSelected(0);
-                if (firstSongInList) {
-                    tableView.getItems().remove(songSelected);
-                    songList.remove(songSelected);
+                boolean firstSongInList = listView.getSelectionModel().isSelected(0);
+                if (firstSongInList) 
+                {
+                    listView.getItems().remove(songSelected);
                     SongPersistence.clearFile();
                     String songListString = "";
                     for (Song s : songList)
@@ -244,22 +249,21 @@ public class SongListController implements Initializable{
                         SongPersistence.writeToFile(songListString);
                     }
                 } else {
-                tableView.getItems().remove(songSelected);
-                SongPersistence.clearFile();
-                String songListString = "";
-                for (Song s : songList)
-                {
+                    listView.getItems().remove(songSelected);
+                    SongPersistence.clearFile();
+                    String songListString = "";
+                    for (Song s : songList)
+                    {
                     songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
                     SongPersistence.writeToFile(songListString);
+                    }        
                 }
-                tableView.getSelectionModel().selectNext();
-                }
-            }
-            if(songList.isEmpty())
-            {
+                if(songList.isEmpty())
+                {
                 SongPersistence.clearFile();
-            }   
-        }     
-    } 
+                }   
+            }     
+        } 
+    }
 }
 

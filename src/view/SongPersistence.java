@@ -14,11 +14,11 @@ public class SongPersistence {
     static String fileName = "library0.txt";
     static String absolutePath = directory + File.separator + "src/" + fileName;
 
-    public static void writeToFile(String songList)
+    public static void writeToFile(String songListString)
     {
         // Write the content in file 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(absolutePath, false));) {
-            writer.append(songList);
+            writer.append(songListString);
             writer.close();
         } catch (IOException e) {
             // Exception handling
