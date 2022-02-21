@@ -56,6 +56,12 @@ public class SongPersistence {
             }
             while (myReader.hasNextLine()) {
               String songStringData = myReader.nextLine();
+              if (songStringData.equals(""))
+              {
+                myReader.close();
+                songList = null;
+                return songList;
+              }
               String[] a = songStringData.split(", ");
               Song songFromFile = new Song(a[0], a[1], a[2], Integer.parseInt(a[3]));
               songList.add(songFromFile);

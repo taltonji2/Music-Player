@@ -64,8 +64,6 @@ public class SongListController {
 
     
     public void start(Stage mainStage){
-
-
         songList = FXCollections.observableArrayList();
         String directory = System.getProperty("user.dir");
         String fileName = "library0.txt";
@@ -73,7 +71,7 @@ public class SongListController {
         File f = new File(absolutePath);
 
         if(f.exists() && !f.isDirectory()) { 
-            if (f.length() != 0)
+            if (f.length() != 0 && SongPersistence.restoreFromFile() != null)
             {
                 for (Song s : SongPersistence.restoreFromFile())
                 {
@@ -88,10 +86,6 @@ public class SongListController {
         {
             SongPersistence.createFile();
         }
-        sortSongList();
-        listView.setItems(songList);
-        songSelected = songList.get(0); //set first song as selected
-        listView.getSelectionModel().select(0);
 
         //Button events
         addButton.setOnAction(e -> addButtonClicked());
@@ -132,40 +126,102 @@ public class SongListController {
     {   
         if(songSelected != null)
         {
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Do you wish to edit this song?");
-            alert.setContentText("Confirm or close.");
-            
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                songSelected.setSong(songEdit.getText());
-                songSelected.setAlbum(albumEdit.getText());
-                songSelected.setArtist(artistEdit.getText());
-                songSelected.setYear(Integer.parseInt(yearEdit.getText()));
-                sortSongList();
-                SongPersistence.clearFile();
-                String songListString = "";
-                for (Song s : songList)
-                {
-                    songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
-                    SongPersistence.writeToFile(songListString);
+            if(songEdit.getText().isEmpty() || artistEdit.getText().isEmpty())
+            {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Song title and artist are required.");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
                 }
-                songEdit.clear();
-                artistEdit.clear();
-                albumEdit.clear();
-                yearEdit.clear();
-                listView.refresh();
-            } else {
-                // ... user chose CANCEL or closed the dialog
-              
-                listView.refresh();
-                songEdit.setText(songSelected.getSong());
-                artistEdit.setText(songSelected.getArtist());
-                albumEdit.setText(songSelected.getAlbum());
-                yearEdit.setText(Integer.toString(songSelected.getYear()));
+            } 
+            if(songInList(songEdit.getText(), artistEdit.getText()) == true)
+            {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Song already present");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                }
+            }
+            else {
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation Dialog");
+                alert.setHeaderText("Do you wish to edit this song?");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    songSelected.setSong(songEdit.getText());
+                    songSelected.setArtist(artistEdit.getText());
+                    if(!albumEdit.getText().isEmpty())
+                        songSelected.setAlbum(albumEdit.getText());
+                    if(!yearEdit.getText().isEmpty())
+                        songSelected.setYear(Integer.parseInt(yearEdit.getText()));
+
+                    sortSongList();
+                    SongPersistence.clearFile();
+                    String songListString = "";
+                    for (Song s : songList)
+                    {
+                        songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                        SongPersistence.writeToFile(songListString);
+                    }
+                    songEdit.clear();
+                    artistEdit.clear();
+                    albumEdit.clear();
+                    yearEdit.clear();
+                    listView.refresh();
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                }
             }
         }
+    }
+
+    //Is song present? Method
+    boolean songInList (String songTitle, String songArtist)
+    {
+        for(Song s : listView.getItems())
+            if(s.getSong().equals(songTitle) && s.getArtist().equals(songArtist))
+            {return true;}
+        return false;
     }
 
     //Sort Method
@@ -176,41 +232,67 @@ public class SongListController {
 
     //Add Button Method
     public void addButtonClicked() {
-        if (songAdd != null && artistAdd != null)
+        if (!songAdd.getText().equals(null) && !artistAdd.getText().equals(null))
         {
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Do you wish to add this song?");
-            alert.setContentText("Confirm or close.");
-            
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                Song newSong = new Song();
-                newSong.setSong(songAdd.getText());
-                newSong.setArtist(artistAdd.getText());
-                newSong.setAlbum(albumAdd.getText());
-                newSong.setYear(Integer.parseInt(yearAdd.getText()));
-                songList.add(newSong);
-                listView.getItems().add(newSong);
-                sortSongList();
-                SongPersistence.clearFile();
-                String songListString = "";
-                for (Song s : songList)
-                {
-                    songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
-                    SongPersistence.writeToFile(songListString);
-                }
-                songAdd.clear();
-                artistAdd.clear();
-                albumAdd.clear();
-                yearAdd.clear();
-            } else {
+            if(songInList(songAdd.getText(), artistAdd.getText()) == true)
+            {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Song already present");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                } else {
                     // ... user chose CANCEL or closed the dialog
-                songAdd.clear();
-                artistAdd.clear();
-                albumAdd.clear();
-                yearAdd.clear();
-            } 
+                    listView.refresh();
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                }
+            } else {
+                //Adding the song
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation Dialog");
+                alert.setHeaderText("Do you wish to add this song?");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    Song newSong = new Song();
+                    newSong.setSong(songAdd.getText());
+                    newSong.setArtist(artistAdd.getText());
+                    newSong.setAlbum(albumAdd.getText());
+                    if(!yearAdd.getText().isEmpty())
+                        newSong.setYear(Integer.parseInt(yearAdd.getText()));
+                    listView.getItems().add(newSong);
+                    sortSongList();
+                    SongPersistence.clearFile();
+                    String songListString = "";
+                    for (Song s : listView.getItems())
+                    {
+                        songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
+                        SongPersistence.writeToFile(songListString);
+                    }
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                } else {
+                        // ... user chose CANCEL or closed the dialog
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                } 
+            }
         } else {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
@@ -243,7 +325,7 @@ public class SongListController {
                     listView.getItems().remove(songSelected);
                     SongPersistence.clearFile();
                     String songListString = "";
-                    for (Song s : songList)
+                    for (Song s : listView.getItems())
                     {
                         songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
                         SongPersistence.writeToFile(songListString);
@@ -258,7 +340,7 @@ public class SongListController {
                     SongPersistence.writeToFile(songListString);
                     }        
                 }
-                if(songList.isEmpty())
+                if(listView.getItems().isEmpty())
                 {
                 SongPersistence.clearFile();
                 }   
