@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class SongPersistence {
     static String directory = System.getProperty("user.dir");
     static String fileName = "library0.txt";
-    static String absolutePath = directory + File.separator + "src/view/" + fileName;
+    static String absolutePath = directory + File.separator + "src/" + fileName;
 
     public static void writeToFile(String songListString)
     {
