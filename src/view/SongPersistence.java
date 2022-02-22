@@ -1,3 +1,4 @@
+//by Scott Skibin, Tim Altonji
 package view;
 
 import java.io.BufferedWriter;

@@ -1,3 +1,4 @@
+//by Scott Skibin, Tim Altonji
 package view;
 
 import java.io.File;
@@ -70,6 +71,22 @@ public class SongListController {
         String absolutePath = directory + File.separator + "src/" + fileName;
         File f = new File(absolutePath);
 
+        //initialize listener for listview row selections to display in edit text fields
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            songSelected = newVal;
+            if (newVal != null) {
+                //update selected song
+                songEdit.setText(newVal.getSong());
+                artistEdit.setText(newVal.getArtist());
+                albumEdit.setText(newVal.getAlbum());
+                yearEdit.setText(Integer.toString(newVal.getYear()));
+                if (newVal.getYear() == 0){
+                    yearEdit.clear();
+                }
+            }
+            
+        });
+
         if(f.exists() && !f.isDirectory()) { 
             if (f.length() != 0 && SongPersistence.restoreFromFile() != null)
             {
@@ -79,7 +96,7 @@ public class SongListController {
                 }
                 sortSongList();
                 listView.setItems(songList);
-                songSelected = songList.get(0); //set first song as selected
+                songSelected = songList.get(0); //set first song as selected **DO WE NEED THIS?**
                 listView.getSelectionModel().select(0);
             }
         } else
@@ -104,28 +121,54 @@ public class SongListController {
                     setText(s.getSong()+"/"+s.getArtist());
                 }             
             }
-        });
-   
-        //initialize listener for tableview row selections to display in edit text fields
-        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            songSelected = newVal;
-            if (newVal != null) {
-                //update selected song
-                songEdit.setText(newVal.getSong());
-                artistEdit.setText(newVal.getArtist());
-                albumEdit.setText(newVal.getAlbum());
-                yearEdit.setText(Integer.toString(newVal.getYear()));
-            }
-            
-        });
-            
+        });         
     }
     
+    //Is song present? Method
+    boolean boolSongInList (String songTitle, String songArtist){
+        for(Song s : listView.getItems())
+            if(s.getSong().equals(songTitle) && s.getArtist().equals(songArtist))
+            {return true;}
+        return false;
+    }
+    Song songInList (String songTitle, String songArtist){
+        for(Song s : listView.getItems())
+            if(s.getSong().equals(songTitle) && s.getArtist().equals(songArtist))
+            {return s;}
+        return null;
+    }
+    //checks if string in TextField input is an integer
+    boolean isInt(TextField tf){ 
+        if (tf.getText().isEmpty()){
+            System.out.println("if");
+            return true;
+            
+        }
+        else {
+            System.out.println("else");
+            try{ 
+                Integer.parseInt(tf.getText()); 
+                return true; 
+            } 
+            catch (NumberFormatException e){  
+                return false; 
+            } 
+        }
+    }
+
+    //Sort Method
+    public void sortSongList() {
+        songList.sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(Comparator.comparing(Song::getSong, String.CASE_INSENSITIVE_ORDER)));
+    }
+
     //Edit Button Method
     public void editButtonClicked()
     {   
-        if(songSelected != null)
+        if(songSelected != null) // **DO WE NEED THIS**
         {
+            Song songIL = songInList(songEdit.getText(), artistEdit.getText());
+            boolean inList = boolSongInList(songEdit.getText(), artistEdit.getText());
             if(songEdit.getText().isEmpty() || artistEdit.getText().isEmpty())
             {
                 Alert alert = new Alert(AlertType.ERROR);
@@ -141,6 +184,9 @@ public class SongListController {
                     artistEdit.setText(songSelected.getArtist());
                     albumEdit.setText(songSelected.getAlbum());
                     yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
                 } else {
                     // ... user chose CANCEL or closed the dialog
                     listView.refresh();
@@ -148,9 +194,13 @@ public class SongListController {
                     artistEdit.setText(songSelected.getArtist());
                     albumEdit.setText(songSelected.getAlbum());
                     yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
                 }
             } 
-            if(songInList(songEdit.getText(), artistEdit.getText()) == true)
+            
+            else if((inList) && (songIL.getSong() != songSelected.getSong() && songIL.getArtist() != songSelected.getArtist()))
             {
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Error Dialog");
@@ -165,6 +215,9 @@ public class SongListController {
                     artistEdit.setText(songSelected.getArtist());
                     albumEdit.setText(songSelected.getAlbum());
                     yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
                 } else {
                     // ... user chose CANCEL or closed the dialog
                     listView.refresh();
@@ -172,6 +225,38 @@ public class SongListController {
                     artistEdit.setText(songSelected.getArtist());
                     albumEdit.setText(songSelected.getAlbum());
                     yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
+                }
+            }
+            else if(!(isInt(yearEdit))){
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Invalid Year input");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    listView.refresh();
+                    songEdit.setText(songSelected.getSong());
+                    artistEdit.setText(songSelected.getArtist());
+                    albumEdit.setText(songSelected.getAlbum());
+                    yearEdit.setText(Integer.toString(songSelected.getYear()));
+                    if (songSelected.getYear() == 0){
+                        yearEdit.clear();
+                    }
                 }
             }
             else {
@@ -197,10 +282,6 @@ public class SongListController {
                         songListString += s.getSong() + ", " + s.getArtist() + ", " + s.getAlbum() + ", " + s.getYear() + "\n"; 
                         SongPersistence.writeToFile(songListString);
                     }
-                    songEdit.clear();
-                    artistEdit.clear();
-                    albumEdit.clear();
-                    yearEdit.clear();
                     listView.refresh();
                 } else {
                     // ... user chose CANCEL or closed the dialog
@@ -215,30 +296,15 @@ public class SongListController {
         }
     }
 
-    //Is song present? Method
-    boolean songInList (String songTitle, String songArtist)
-    {
-        for(Song s : listView.getItems())
-            if(s.getSong().equals(songTitle) && s.getArtist().equals(songArtist))
-            {return true;}
-        return false;
-    }
-
-    //Sort Method
-    public void sortSongList() {
-        songList.sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
-                .thenComparing(Comparator.comparing(Song::getSong, String.CASE_INSENSITIVE_ORDER)));
-    }
-
     //Add Button Method
     public void addButtonClicked() {
-        if (!songAdd.getText().equals(null) && !artistAdd.getText().equals(null))
-        {
-            if(songInList(songAdd.getText(), artistAdd.getText()) == true)
+        if (!songAdd.getText().equals(null) && !artistAdd.getText().equals(null)) // ** DO WE NEED THIS**
+        {   
+            if(songAdd.getText().isEmpty() || artistAdd.getText().isEmpty())
             {
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Error Dialog");
-                alert.setHeaderText("Song already present");
+                alert.setHeaderText("Song title and artist are required.");
                 alert.setContentText("Confirm or close.");
                 
                 Optional<ButtonType> result = alert.showAndWait();
@@ -257,7 +323,49 @@ public class SongListController {
                     albumAdd.clear();
                     yearAdd.clear();
                 }
-            } else {
+            } 
+            else if(boolSongInList(songAdd.getText(), artistAdd.getText()) == true)
+            {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Song already present");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    listView.refresh(); //  **IS THIS refresh neccessary?**
+                    songAdd.clear();
+                    artistAdd.clear();
+                    albumAdd.clear();
+                    yearAdd.clear();
+                }
+            } 
+            else if(!(isInt(yearAdd))){
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Invalid Year input");
+                alert.setContentText("Confirm or close.");
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    // ... user chose OK
+                    listView.refresh();
+                    yearAdd.clear();
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    listView.refresh();
+                    yearAdd.clear();
+                }
+            }
+            else {
                 //Adding the song
                 Alert alert = new Alert(AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation Dialog");
@@ -293,21 +401,8 @@ public class SongListController {
                     yearAdd.clear();
                 } 
             }
-        } else {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error Dialog");
-            alert.setHeaderText("Song title and artist are required.");
-            alert.setContentText("Confirm or close.");
-            
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                // ... user chose OK
-            } else {
-                // ... user chose CANCEL or closed the dialog
-            }
-        }
+        } 
     }
-    
 
     //Delete deletes two songs
     //Delete Button Method
@@ -332,6 +427,7 @@ public class SongListController {
                     }
                 } else {
                     listView.getItems().remove(songSelected);
+                    listView.getSelectionModel().selectNext();
                     SongPersistence.clearFile();
                     String songListString = "";
                     for (Song s : songList)
@@ -342,7 +438,11 @@ public class SongListController {
                 }
                 if(listView.getItems().isEmpty())
                 {
-                SongPersistence.clearFile();
+                    songEdit.clear();
+                    artistEdit.clear();
+                    albumEdit.clear();
+                    yearEdit.clear();
+                    SongPersistence.clearFile();
                 }   
             }     
         } 

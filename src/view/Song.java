@@ -1,3 +1,4 @@
+//by Scott Skibin, Tim Altonji
 package view;
 
 public class Song {
