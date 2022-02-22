@@ -155,7 +155,7 @@ public class SongListController {
 
     //Sort Method
     public void sortSongList() {
-        songList.sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
+        listView.getItems().sort(Comparator.comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing(Comparator.comparing(Song::getSong, String.CASE_INSENSITIVE_ORDER)));
     }
 
@@ -361,6 +361,7 @@ public class SongListController {
                 listView.getItems().add(newSong);
                 listView.getSelectionModel().select(newSong);
                 sortSongList();
+                listView.refresh();
                 SongPersistence.clearFile();
                 String songListString = "";
                 for (Song s : listView.getItems())
